@@ -69,10 +69,14 @@ def main():
 
                         #WikiPedia Article Scraping
                         page = wikipediaScraper.getWikiPage(inputWikiLink)
+                        #Geting and Seting Article Title
                         title = page.find(id="firstHeading")
                         st.sidebar.markdown("**Article Title: **"+title.string)
-                        
+                        #Extracting paragraphs from the page (article) content
                         text = wikipediaScraper.extractParagraphsFromPage(page)
+                        #Extracting sentences and storing them in csv
+                        wikipediaScraper.convertTextToSentencesAndStore(text)
+                        #Generating Tokens
                         tokens = lexicalAnalysis.tokenization(text)
                         
                         # layout
