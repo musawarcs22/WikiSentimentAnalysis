@@ -5,7 +5,16 @@ import wikipediaScraper
 import relationshipExtrator
 import namedEntityRecognition
 
-def customizeUI():
+
+def isWikiURL(inputUrl): #This functions checks wheather URL belongs to  Wikipedia or not
+    inputUrl = inputUrl[0:30]
+    WIKI_URL = "https://en.wikipedia.org/wiki/"
+    if(inputUrl==WIKI_URL):
+        return True
+    else:
+        return False
+
+def customizeUI(): #This function is for customization the UI of the interface
 
     #Set the page title and icon
     st.set_page_config(
@@ -53,42 +62,46 @@ def main():
             if fetchTweetsBtn:
                 if validators.url(inputWikiLink):
                     # URL is valid
-                    st.info("Fetching Article :hourglass:")
-                    #print(inputWikiLink)
+                    if isWikiURL(inputWikiLink):
+                        # URL is of Wikipedia only
+                        
+                        st.info("Fetching Article :hourglass:")
 
-                    #WikiPedia Scraping
-                    page = wikipediaScraper.getWikiPage(inputWikiLink)
-                    title = page.find(id="firstHeading")
-                    st.sidebar.markdown("**Article Title: **"+title.string)
-                    
-                    text = wikipediaScraper.extractParagraphsFromPage(page)
-                    tokens = lexicalAnalysis.tokenization(text)
-                    
-                    # layout
-                    col1,col2= st.columns(2) # 2 columns
-                    with col1:
+                        #WikiPedia Article Scraping
+                        page = wikipediaScraper.getWikiPage(inputWikiLink)
+                        title = page.find(id="firstHeading")
+                        st.sidebar.markdown("**Article Title: **"+title.string)
                         
-                        st.info("Word Cloud")
-                        lexicalAnalysis.drawWordClud(tokens)
+                        text = wikipediaScraper.extractParagraphsFromPage(page)
+                        tokens = lexicalAnalysis.tokenization(text)
                         
-                        st.info("Top most frequently occuring words")
-                        lexicalAnalysis.mostCommonWords(tokens)
-                         
-                        st.info("Named Entity Recognition")
-                        namedEntityRecognition.visualizeNamedEntities(text)
-                        namedEntityRecognition.visulizeSentences(text,"ent")
-                        
-                    with col2:
-                        
-                        st.info("Entity Relationship Graph")
-                        relationshipExtrator.plotEntityPairsGraph()
-                        
-                        st.info("POS Tagging")
-                        namedEntityRecognition.partsOfSpeechTagingVisualization(text)
-                        
-                        st.info("Dependency Parsing")
-                        namedEntityRecognition.visulizeSentences(text,"dep")
-                         
+                        # layout
+                        col1,col2= st.columns(2) # 2 columns
+                        with col1:
+                            
+                            st.info("Word Cloud")
+                            lexicalAnalysis.drawWordClud(tokens)
+                            
+                            st.info("Top most frequently occuring words")
+                            lexicalAnalysis.mostCommonWords(tokens)
+                            
+                            st.info("Named Entity Recognition")
+                            namedEntityRecognition.visualizeNamedEntities(text)
+                            namedEntityRecognition.visulizeSentences(text,"ent")
+                            
+                        with col2:
+                            
+                            st.info("Entity Relationship Graph")
+                            relationshipExtrator.plotEntityPairsGraph()
+                            
+                            st.info("POS Tagging")
+                            namedEntityRecognition.partsOfSpeechTagingVisualization(text)
+                            
+                            st.info("Dependency Parsing")
+                            namedEntityRecognition.visulizeSentences(text,"dep")
+                    else:
+                        # Valid URL doesn't belong to wikipedia
+                        st.error("Please Enter a Valid URL of Wikipedia Article only")     
                 else:
                     # URL is invalid
                     st.error("Please Enter a Valid URL")
